@@ -143,7 +143,7 @@ const controls = {
       async function postData(formattedFormData){
         
         const response = await fetch(
-            'http://localhost/map/process.php',
+          'https://titaniferous-exampl.000webhostapp.com/process.php',
             {
                 method: 'POST',
                
