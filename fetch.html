@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Leaflet Map</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://d19vzq90twjlae.cloudfront.net/leaflet-0.7/leaflet.css" />
+</head>
+<body>
+    <div id="map" style="width: 600px; height: 400px"></div>
+
+    <script src="https://d19vzq90twjlae.cloudfront.net/leaflet-0.7/leaflet.js">
+    </script>
+
+    <script>
+      
+
+
+
+
+
+        var map = L.map('map').setView([-41.2858, 174.78682], 14);
+        mapLink = 
+            '<a href="http://www.esri.com/">Esri</a>';
+        wholink = 
+            'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+        L.tileLayer(
+            'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; '+mapLink+', '+wholink,
+            maxZoom: 18,
+            }).addTo(map);
+
+
+
+
+
+
+            async function getUsers() {
+    let url = 'http://localhost/map/get.php';
+    try {
+        let res = await fetch(url);
+        console.log(res)
+        return await res.json();
+    } catch (error) {
+        console.log(error);
+    }
+}
+async function renderUsers() {
+    let users = await getUsers();
+   
+    users.forEach(user => {
+        data = (users)
+       var polylines =  L.polyline( [],{ color: 'red', weight: 10, opacity: .7, dashArray: '20,15', lineJoin: 'round'}).addTo(map);
+         console.log(data)
+    });
+ 
+//         var output = users.map(function(obj) {
+//   return Object.keys(obj).sort().map(function(key) { 
+//     return parseFloat(obj[key]);
+//   });
+// });
+// for (var i=0; i<output.length; i++) {
+//     var array =  [];
+//     var res =  [];
+   
+//      res= output[i];
+//      for (var j=0; j<res.length; j++) {
+        
+// var polylines =  L.polyline( [[-41.286, 174.796], [-41.281, 174.786]],{ color: 'red', weight: 10, opacity: .7, dashArray: '20,15', lineJoin: 'round'}).addTo(map);
+//          console.log(polylines)
+// }
+
+// }
+
+// var polyline = new L.polyline([
+    // [-41.286, 174.796],
+    // [-41.281, 174.786],
+    // [-41.279, 174.776],
+    // [-41.290, 174.775],
+    // [-41.292, 174.788]
+// ],
+// {
+//     color: 'red',
+//     weight: 10,
+//     opacity: .7,
+//     dashArray: '20,15',
+//     lineJoin: 'round'
+// }
+// ).addTo(map);
+// console.log(polyline)
+  
+}
+
+renderUsers();
+
+
+
+
+
+
+
+        
+  
+    </script>
+</body>
+</html>
