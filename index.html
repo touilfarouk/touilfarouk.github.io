@@ -15,42 +15,56 @@
       <canvas id="myCanvas"></canvas>
       <script src="./markerDetector.js"></script>
       <script>
-         const myVideo = document.createElement("video");
-         const ctx = myCanvas.getContext("2d");
-         const markerDetector = new MarkerDetector();
+         var myVideo = document.createElement("video");
+         var myCanvas = document.getElementById("myCanvas");
+         var ctx = myCanvas.getContext("2d");
+         var markerDetector = new MarkerDetector();
 
-         const distance = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y);
+         function distance(p1, p2) {
+            return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+         }
 
-         const loop = () => {
+         function loop() {
             ctx.drawImage(myVideo, 0, 0, myCanvas.width, myCanvas.height);
-            const imgData = ctx.getImageData(0, 0, myCanvas.width, myCanvas.height);
-            const res = markerDetector.detect(imgData);
+            var imgData = ctx.getImageData(0, 0, myCanvas.width, myCanvas.height);
+            var res = markerDetector.detect(imgData);
             if (res) {
                ctx.fillStyle = "red";
-               for (const point of res.leftMarker.points) {
+               for (var i = 0; i < res.leftMarker.points.length; i++) {
+                  var point = res.leftMarker.points[i];
                   ctx.fillRect(point.x, point.y, 1, 1);
                }
                ctx.fillStyle = "yellow";
-               for (const point of res.rightMarker.points) {
+               for (var i = 0; i < res.rightMarker.points.length; i++) {
+                  var point = res.rightMarker.points[i];
                   ctx.fillRect(point.x, point.y, 1, 1);
                }
             }
-            requestAnimationFrame(loop);
-         };
+            setTimeout(loop, 16);  // Using setTimeout instead of requestAnimationFrame for better compatibility
+         }
 
-         navigator.mediaDevices.getUserMedia({ video: true })
-            .then((rawData) => {
-               myVideo.srcObject = rawData;
-               myVideo.play();
-               myVideo.onloadeddata = () => {
-                  myCanvas.width = myVideo.videoWidth;
-                  myCanvas.height = myVideo.videoHeight;
-                  loop();
-               };
-            })
-            .catch((err) => {
-               alert(err);
+         function onSuccess(rawData) {
+            myVideo.src = URL.createObjectURL(rawData);
+            myVideo.play();
+            myVideo.addEventListener('loadeddata', function() {
+               myCanvas.width = myVideo.videoWidth;
+               myCanvas.height = myVideo.videoHeight;
+               loop();
             });
+         }
+
+         function onError(err) {
+            alert(err);
+         }
+
+         // Fallback for getUserMedia
+         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+         if (navigator.getUserMedia) {
+            navigator.getUserMedia({ video: true }, onSuccess, onError);
+         } else {
+            alert('getUserMedia is not supported in your browser');
+         }
       </script>
    </body>
 </html>
