@@ -1,62 +1,126 @@
-const recordAudio = () =>
-  new Promise(async (resolve) => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
-    const audioChunks = [];
-    mediaRecorder.addEventListener("dataavailable", (event) => {
-      audioChunks.push(event.data);
-    });
+(function () {
+  document.getElementById("copyright-year").textContent =
+    new Date().getFullYear();
 
-    const start = () => mediaRecorder.start();
-
-    const stop = () =>
-      new Promise((resolve) => {
-        mediaRecorder.addEventListener("stop", () => {
-          const audioBlob = new Blob(audioChunks);
-          const audioUrl = URL.createObjectURL(audioBlob);
-          const audio = new Audio(audioUrl);
-          const play = () => audio.play();
-          resolve({ audioBlob, audioUrl, play });
-        });
-        mediaRecorder.stop();
-      });
-    resolve({ start, stop });
+  let formFieldLabel = document.getElementById("form-file-label");
+  formFieldLabel.addEventListener("keydown", function (event) {
+    if (event.keyCode == "13") {
+      document.getElementById("form-file").click();
+    }
   });
 
-const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
+  let file = document.getElementById("form-file");
+  file.addEventListener("change", function (event) {
+    let firstFile = this.files[0];
 
-var record = true;
+    let valid = checkInput(firstFile);
 
-const startRecording = async () => {
-  const recording = await recordAudio();
-  const recorder = document.getElementById("recorder");
-  recorder.disabled = true;
-  recording.start();
-  while (record == true) {
-    await sleep(1);
+    if (valid) {
+      // Add file src to audio
+      addAudio(firstFile);
+
+      var data = new FormData();
+      data.append("recordedFile", firstFile);
+
+      $("#progress").show();
+      $("#parent-recorder").hide();
+
+      $.ajax({
+        url: "upload.php", // Specify the URL where the server script handles the file upload
+        type: "POST",
+        data: data,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+          var jsonData = JSON.parse(data);
+          window.uploadMessage = jsonData.message;
+          window.location = "https://vflash.servehttp.com/rec/";
+        },
+        error: function (error) {
+          console.log(error);
+        },
+        complete: function (xhr, status) {
+          setTimeout(function () {
+            $("#progress").hide();
+            $("#parent-recorder").show();
+            M.toast({ html: window.uploadMessage });
+            delete uploadMessage;
+            window.location = "https://vflash.servehttp.com/rec/";
+          }, 1000);
+        },
+      });
+    }
+  });
+
+  function addAudio(file) {
+    let reader = new FileReader();
+
+    reader.addEventListener("load", function (event) {
+      let audio = document.getElementById("audio-player");
+      audio.src = event.target.result;
+    });
+
+    reader.readAsDataURL(file);
   }
-  const audio = await recording.stop();
-  await sleep(2000);
-  audio.play();
-  recorder.disabled = false;
-};
 
-document.getElementById("recorder").addEventListener("click", (e) => {
-  if (document.getElementById("recorder").classList.contains("recording")) {
-    document.getElementById("recorder").classList.remove("recording");
-    document.getElementById("recorder").classList.add("download");
-    record = false;
-    setTimeout(function () {
-      document.getElementById("recorder").classList.remove("download");
-      document.getElementById("recorder").classList.add("out");
-    }, 1000);
-  } else if (
-    !document.getElementById("recorder").classList.contains("recording") &&
-    !document.getElementById("recorder").classList.contains("download")
-  ) {
-    document.getElementById("recorder").classList.remove("out");
-    document.getElementById("recorder").classList.add("recording");
-    record = true;
-    startRecording();
+  function checkInput(input) {
+    // If a file has been received
+    if (input.name) {
+      // If the file has the mp3, ogg, wav, webm, m4a, aac, or avi extension
+      if (
+        input.name.slice(-3) == "wav" ||
+        input.name.slice(-3) == "mp3" ||
+        input.name.slice(-3) == "ogg" ||
+        input.name.slice(-3) == "m4a" ||
+        input.name.slice(-3) == "aac" ||
+        input.name.slice(-3) == "avi" ||
+        input.name.slice(-4) == "webm"
+      ) {
+        document.getElementById("form-file-label").textContent =
+          "You have selected a valid file";
+        document.getElementById("feedback-name").textContent = input.name;
+        document.getElementById("feedback-size").textContent =
+          input.size + " bytes";
+        document.getElementById("feedback-type").textContent = input.type;
+        return true;
+      } else if (input.name.slice(-3) == "wav") {
+        // Add this condition for .wav support
+        document.getElementById("form-file-label").textContent =
+          "You have selected a valid file";
+        document.getElementById("feedback-name").textContent = input.name;
+        document.getElementById("feedback-size").textContent =
+          input.size + " bytes";
+        document.getElementById("feedback-type").textContent = input.type;
+        return true;
+      } else {
+        document.getElementById("form-file-label").textContent =
+          "Please select an audio file with the mp3/ogg/wav/webm/m4a/aac/avi extension";
+        document.getElementById("feedback-name").textContent = input.name;
+        document.getElementById("feedback-size").textContent =
+          input.size + " bytes";
+        document.getElementById("feedback-type").textContent = input.type;
+        return false;
+      }
+    } else {
+      document.getElementById("form-file-label").textContent =
+        "You have not selected a file";
+      document.getElementById("feedback-name").textContent = "N/A";
+      return false;
+    }
   }
-});
+
+  function toggleNavigation() {
+    document
+      .getElementById("navigation")
+      .classList.toggle("navigation-visible");
+    document.getElementById("navigation").classList.toggle("navigation-hidden");
+  }
+
+  let menu = document.getElementById("menu");
+  menu.addEventListener("click", toggleNavigation);
+  menu.addEventListener("keydown", function (event) {
+    if (event.keyCode == "13") {
+      toggleNavigation();
+    }
+  });
+})();
