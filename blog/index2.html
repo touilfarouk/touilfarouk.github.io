@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!--=============== basic  ===============-->
+    <meta charset="UTF-8" />
+    <title>Codacom Personal Portfolio</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <!--=============== css  ===============-->
+    <link type="text/css" rel="stylesheet" href="./css/plugins.css" />
+    <link type="text/css" rel="stylesheet" href="./css/style.css" />
+    <link type="text/css" rel="stylesheet" href="./css/color.css" />
+    <!--=============== favicons ===============-->
+    <link
+      rel="shortcut icon"
+      href="https://touilfarouk.github.io/images/favicon.ico"
+    />
+    <link rel="manifest" href="https://touilfarouk.github.io/manifest.json" />
+    <!-- older android support (manifest uses theme_color)-->
+    <meta name="theme-color" content="#c64817" />
+    <!-- ios support  (manifest theme_color and icons)-->
+    <link
+      rel="apple-touch-icon"
+      href="https://touilfarouk.github.io/img/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-status-bar" content="#c64817" />
+  </head>
+  <body>
+    <script src="./js/babel.min.js"></script>
+    <script src="https://unpkg.com/react@experimental/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@experimental/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/history@latest/umd/history.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router/6.0.2/react-router.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/6.0.2/react-router-dom.development.js"></script>
+
+    <span class="isonline"></span>
+    <script
+      data-plugins="transform-modules-umd"
+      type="text/babel"
+      data-type="module"
+      src="./components/Header.js"
+    ></script>
+    <script
+      data-plugins="transform-modules-umd"
+      type="text/babel"
+      data-type="module"
+      src="./components/Aside.js"
+    ></script>
+    <script
+      data-plugins="transform-modules-umd"
+      type="text/babel"
+      data-type="module"
+      src="./components/App.jsx"
+    ></script>
+    <script
+      data-plugins="transform-modules-umd"
+      type="text/babel"
+      data-type="module"
+      src="./index.js"
+    ></script>
+
+    <div id="root"></div>
+
+    <!-- Main end -->
+    <!--=============== scripts  ===============-->
+
+    <script type="text/javascript" src="./js/app.js"></script>
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/plugins.js"></script>
+    <script type="text/javascript" src="./js/scripts.js"></script>
+  </body>
+</html>

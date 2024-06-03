@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!--=============== basic  ===============-->
+    <meta charset="UTF-8" />
+    <title>Codacom</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <!--=============== css  ===============-->
+    <link type="text/css" rel="stylesheet" href="./css/plugins.css" />
+    <link type="text/css" rel="stylesheet" href="./css/style.css" />
+    <link type="text/css" rel="stylesheet" href="./css/color.css" />
+
+    <!--=============== favicons ===============-->
+    <!--=============== player ===============-->
+    <link
+      href="http://fonts.googleapis.com/css?family=Lekton"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <!-- <link
+      rel="stylesheet"
+      type="text/css"
+      href="./css/jquery.mb.miniAudioPlayer.min.css"
+      title="style"
+      media="screen"
+    /> -->
+    <!--=============== player ===============-->
+    <!-- pwa manifest and android support -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#bada55" />
+    <!-- ios support -->
+    <!-- <link rel="apple-touch-icon" href="/img/icon-96x96.png" /> -->
+    <meta name="apple-mobile-web-app-status-bar" content="#bada55" />
+  </head>
+  <style type="text/css">
+    /*Generic page style*/
+
+    button {
+      padding: 3px;
+      display: inline-block;
+      cursor: pointer;
+      font: 16px/18px Arial, Helvetica, sans-serif;
+      color: #fff;
+      background-color: #ccc;
+      border-radius: 5px;
+      box-shadow: #999 1px 1px 3px;
+      border: 1px solid white;
+      text-shadow: 1px -1px 2px #aaa9a9 !important;
+    }
+
+    button:hover {
+      color: #666;
+    }
+
+    hr {
+      border: none;
+      background-color: #ccc;
+      height: 1px;
+    }
+
+    .wrapper span.param {
+      font: normal 13px/15px Lekton, sans-serif;
+      color: #767676;
+      display: block;
+      margin-top: 10px;
+    }
+
+    .attribution {
+      font-size: 12px;
+      margin-top: 10px;
+      color: #868686;
+    }
+
+    .attribution a {
+      color: #868686;
+    }
+    .isonline {
+      /* Set the text color to red for the "Offline" state */
+      color: red;
+    }
+
+    .online-text {
+      /* Set the text color to green for the "Online" state */
+      color: green;
+    }
+  </style>
+  <body>
+    <!-- loader   -->
+    <div class="loader">
+      <div class="loading-text-container">
+        <span class="loading-text">Load<strong>ing</strong></span>
+        <span class="loader_count">0</span>
+      </div>
+      <div class="loader-anim"></div>
+      <div class="loader-anim2 color-bg"></div>
+    </div>
+    <!-- loader  end-->
+    <!-- main start  -->
+    <div id="main">
+      <!-- header-->
+      <header class="main-header">
+        <!-- <img src="img/offline.png" alt="app offline" /> -->
+        <!-- logo  -->
+        <a href="index.html" class="ajax logo-holder"
+          ><img src="images/logo.png" alt=""
+        /></a>
+
+        <!-- logo end -->
+        <!-- nav-button-wrap-->
+
+        <div class="nav-button but-hol">
+          <span class="ncs"></span>
+          <span class="nos"></span>
+          <span class="nbs"></span>
+          <div class="menu-button-text">Menu</div>
+        </div>
+        <!-- nav-button-wrap end-->
+        <!-- header-contacts-->
+        <div class="header-contacts">
+          <ul>
+           <!--  <li>
+              <span>Appelle-moi au </span>
+              <a href="tel:+(+213) 07 99 16 27 46">(+213) 07 99 16 27 46</a>
+            </li>-->
+            <li>
+              <span>M'écrire </span>
+              <a href="mailto:farouktouil@hotmail.com"
+                >:farouktouil@hotmail.com</a
+              >
+            </li>
+            <li>Status: <span class="isonline"></span></li>
+          </ul>
+          <a href="contacts.html" class="ajax contacts-btn">Contactez moi</a>
+        </div>
+        <!-- header-contacts end-->
+      </header>
+      <!-- header end-->
+      <!-- left-header-->
+      <aside class="left-header">
+        <span class="lh_dec color-bg"></span>
+        <div class="left-header_social">
+          <ul>
+            <li>
+              <a href="https://m.facebook.com/touilfarouk/" target="_blank"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+            </li>
+            <li>
+              <a href="https://www.instagram.com/touilfarouk/" target="_blank"
+                ><i class="fab fa-instagram"></i
+              ></a>
+            </li>
+            <li>
+              <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+            </li>
+            <li>
+              <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+      <!-- left-header end-->
+      <!-- share button-->
+      <div class="share-btn showshare color-bg">
+        <span>Share <i class="fal fa-plus"></i></span>
+      </div>
+      <!-- share button end-->
+      <!-- right header-->
+      <div class="hc_dec_color">
+        <div class="page-subtitle"><span></span></div>
+      </div>
+      <!-- right header end-->
+      <!-- wrapper  -->
+      <div id="wrapper">
+        <!-- navigation menu-->
+        <div class="nav-holder">
+          <div class="nav-holder-wrap but-hol">
+            <div class="nav-container fl-wrap">
+              <!-- nav -->
+              <nav class="nav-inner" id="menu">
+                <ul>
+                  <li>
+                    <a href="#" class="act-link">Home</a>
+                    <!--level 2 -->
+                    <ul>
+                      <li><a href="index.html" class="ajax">Slider</a></li>
+                      <li><a href="index2.html" class="ajax">Carousel</a></li>
+                      <li><a href="index3.html" class="ajax">Slideshow</a></li>
+                      <li><a href="index4.html" class="ajax">Video</a></li>
+                      <li><a href="index5.html" class="ajax">Image</a></li>
+                    </ul>
+                    <!--level 2 end -->
+                  </li>
+                  <li><a href="about.html" class="ajax">About</a></li>
+                  <li>
+                    <a href="#">Portfolio</a>
+                    <!--level 2 -->
+                    <ul>
+                      <li>
+                        <a href="portfolio.html" class="ajax">Horizonatal</a>
+                      </li>
+                      <li>
+                        <a href="portfolio3.html" class="ajax"
+                          >Fullscreen Grid
+                        </a>
+                      </li>
+                      <li>
+                        <a href="portfolio2.html" class="ajax">Column Grid</a>
+                      </li>
+                      <li>
+                        <a href="portfolio4.html" class="ajax">Column Grid 2</a>
+                      </li>
+                      <li>
+                        <a href="#">Single</a>
+                        <!--level 3 -->
+                        <ul>
+                          <li>
+                            <a href="portfolio-single.html" class="ajax"
+                              >Style 1</a
+                            >
+                          </li>
+                          <li>
+                            <a href="portfolio-single2.html" class="ajax"
+                              >Style 2</a
+                            >
+                          </li>
+                          <li>
+                            <a href="portfolio-single3.html" class="ajax"
+                              >Style 3</a
+                            >
+                          </li>
+                          <li>
+                            <a href="portfolio-single4.html" class="ajax"
+                              >Style 4</a
+                            >
+                          </li>
+                          <li>
+                            <a href="portfolio-single5.html" class="ajax"
+                              >Style 5</a
+                            >
+                          </li>
+                        </ul>
+                        <!--level 3 end -->
+                      </li>
+                    </ul>
+                    <!--level 2 end -->
+                  </li>
+                  <li><a href="contacts.html" class="ajax">Contacts</a></li>
+                  <li><a href="blog.html" class="ajax">Blog</a></li>
+                </ul>
+              </nav>
+              <!-- nav end-->
+            </div>
+            <div class="nav-footer">
+              <span>&#169; Codacom 2023 / All rights reserved. </span>
+            </div>
+            <div class="nav-holder-wrap_line"></div>
+            <div class="nav-holder-wrap_dec"></div>
+          </div>
+        </div>
+        <div class="nav-overlay"></div>
+        <!-- navigation menu end  -->
+        <!-- content-->
+        <div class="content full-height" data-pagetitle="Home slider">
+          <div class="fl-wrap full-height hero-conatiner">
+            <div class="hero-wrapper fl-wrap full-height hidden-item">
+              <span class="hc_dec"></span>
+              <!-- fs-slider-wrap  -->
+              <!-- hero-slider-wrap -->
+              <div
+                class="hero-slider-wrap home-half-slider fl-wrap full-height"
+              >
+                <div class="hero-slider fs-gallery-wrap fl-wrap full-height">
+                  <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                      <!-- swiper-slide-->
+                      <div class="swiper-slide">
+                      
+                       
+
+
+
+                          <div class="container">
+                            <div class="box">
+                              <span></span>
+                              <div class="content">
+                                <h2>Card one</h2>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                <a href="#">Read More</a>
+                              </div>
+                            </div>
+                           
+                          </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                      
+                      </div>
+                      <!-- swiper-slide end-->
+                      <!-- swiper-slide-->
+
+
+                         <!-- swiper-slide-->
+                         <div class="swiper-slide">
+                        
+                           
+
+                            <div class="container">
+                              <div class="box">
+                                <span></span>
+                                <div class="content">
+                                  <h2>Card one</h2>
+                                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                  <a href="#">Read More</a>
+                                </div>
+                              </div>
+                             
+                            </div>
+
+
+
+                          
+                        </div>
+                        <!-- swiper-slide end-->
+                        <!-- swiper-slide-->
+                  
+                    
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- hero-slider-wrap  end-->
+              <!-- hero-slider-img-->
+              <div class="hero-slider-img hero-slider-wrap_halftwo hidden-item">
+                <div class="swiper-container">
+                  <div class="swiper-wrapper">
+                    <!-- swiper-slide-->
+                    <div class="swiper-slide">
+                      <div
+                        class="bg"
+                        data-bg="images/bg/learn-and-play-withtensoflowjs.jpg"
+                        data-swiper-parallax="20%"
+                      ></div>
+                      <div class="overlay"></div>
+                    </div>
+                    <!-- swiper-slide end-->
+                      <!-- swiper-slide-->
+                      <div class="swiper-slide">
+                        <div
+                          class="bg"
+                          data-bg="images/bg/end-to-end-open-source-machine-learning-platforme.jpg"
+                          data-swiper-parallax="20%"
+                        ></div>
+                        <div class="overlay"></div>
+                      </div>
+                      <!-- swiper-slide end-->
+                    
+                  </div>
+                </div>
+                <div class="hero-corner-dec"></div>
+                <div class="hero-corner-dec2"></div>
+              </div>
+              <!-- hero-slider-img  end-->
+              <!-- slider-controls -->
+              <div class="slider-progress-bar">
+                <span>
+                  <svg class="circ" width="50" height="50">
+                    <circle
+                      class="circ2"
+                      cx="25"
+                      cy="25"
+                      r="23"
+                      stroke="rgba(255,255,255,0.4)"
+                      stroke-width="1"
+                      fill="none"
+                    />
+                    <circle
+                      class="circ1"
+                      cx="25"
+                      cy="25"
+                      r="23"
+                      stroke="#fff"
+                      stroke-width="2"
+                      fill="none"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="clone-counter">
+                <div class="current">01</div>
+              </div>
+              <div class="swiper-counter hs_counter">
+                <div class="current">01</div>
+                <div class="total"></div>
+              </div>
+              <div class="hero-slider_control-wrap">
+                <div class="hsc hsc-prev">
+                  <span><i class="fal fa-angle-left"></i></span>
+                </div>
+                <div class="hsc hsc-next">
+                  <span><i class="fal fa-angle-right"></i></span>
+                </div>
+              </div>
+              <!-- slider-controls end-->
+              <a href="about.html" class="ajax start-btn"
+                ><span>
+                  Start explore <i class="fal fa-long-arrow-right"></i></span
+              ></a>
+              <div class="play-pause_slider hsc_pp auto_actslider">
+                <i class="fas fa-play"></i>
+              </div>
+            </div>
+            <!-- hero-container end-->
+            <div class="wrapper hero-decor-numb"></div>
+            <div class="hero-slider-wrap_pagination"></div>
+            <div class="hero-scroll-down-notifer">
+              <div class="scroll-down-wrap">
+                <div class="mousey">
+                  <div class="scroller"></div>
+                </div>
+              </div>
+              <i class="far fa-angle-down"></i>
+            </div>
+          </div>
+        </div>
+        <!-- content end -->
+        <!-- share-wrapper-->
+        <div class="share-wrapper">
+          <div class="close-share-btn">
+            <i class="fal fa-long-arrow-left"></i>
+          </div>
+          <div class="share-container fl-wrap isShare"></div>
+        </div>
+        <!-- share-wrapper  end -->
+      </div>
+      <!-- wrapper end -->
+      <!-- cursor-->
+      <div class="element">
+        <div class="element-item"></div>
+      </div>
+      <!-- cursor end-->
+    </div>
+    <!-- Main end -->
+    <!--=============== scripts  ===============-->
+    <script src="./js/app.js"></script>
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/plugins.js"></script>
+    <script src="./js/scripts.js"></script>
+
+    <!-- <script
+      type="text/javascript"
+      src="./js/jquery.mb.miniAudioPlayer.js"
+    ></script>
+    <script type="text/javascript">
+      $(function () {
+        $(".audio").mb_miniPlayer({
+          width: 300,
+          inLine: false,
+          id3: true,
+          addShadow: false,
+          pauseOnWindowBlur: false,
+          downloadPage: null,
+        });
+      });
+    </script> -->
+  </body>
+</html>

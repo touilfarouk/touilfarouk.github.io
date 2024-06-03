@@ -1,0 +1,19 @@
+<script src="http://reverbjs.org/reverb.js"></script>
+<script>
+// 1) Setup your audio context (once) and extend with Reverb.js.
+var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+reverbjs.extend(audioContext);
+
+// 2) Load the impulse response; upon load, connect it to the audio output.
+var reverbUrl = "http://reverbjs.org/Library/MaesHowe.m4a";
+var reverbNode = audioContext.createReverbFromUrl(reverbUrl, function() {
+  reverbNode.connect(audioContext.destination);
+});
+
+// 3) Load a test sound; upon load, connect it to the reverb node.
+var sourceUrl = "http://reverbjs.org/Library/SampleBachCMinorPrelude.m4a";
+var sourceNode = audioContext.createSourceFromUrl(sourceUrl, function() {
+  sourceNode.connect(reverbNode);
+});
+</script>
+<a href="javascript:sourceNode.start()">Test</a>
