@@ -13,16 +13,101 @@
    </head>
    <body>
       <canvas id="myCanvas"></canvas>
-      <script src="./markerDetector.js"></script>
       <script>
-         var myVideo = document.createElement("video");
-         var myCanvas = document.getElementById("myCanvas");
-         var ctx = myCanvas.getContext("2d");
-         var markerDetector = new MarkerDetector();
+         // Polyfill for requestAnimationFrame using setTimeout
+         window.requestAnimationFrame = window.requestAnimationFrame || function(callback) {
+            return setTimeout(callback, 16);
+         };
+
+         // Polyfill for getUserMedia
+         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+         function MarkerDetector() {
+            this.threshold = document.createElement("input");
+            this.threshold.type = "range";
+            this.threshold.min = 0;
+            this.threshold.max = 255;
+            this.threshold.value = 50;
+         }
+
+         MarkerDetector.prototype.averagePoints = function(points) {
+            var center = { x: 0, y: 0 };
+            for (var i = 0; i < points.length; i++) {
+               var point = points[i];
+               center.x += point.x;
+               center.y += point.y;
+            }
+            center.x /= points.length;
+            center.y /= points.length;
+            return center;
+         };
+
+         MarkerDetector.prototype.detect = function(imgData) {
+            var points = [];
+            for (var i = 0; i < imgData.data.length; i += 4) {
+               var r = imgData.data[i];
+               var g = imgData.data[i + 1];
+               var b = imgData.data[i + 2];
+               var blueness = b - Math.max(r, g);
+               if (blueness > this.threshold.value) {
+                  var pIndex = i / 4;
+                  var y = Math.floor(pIndex / imgData.width);
+                  var x = pIndex % imgData.width;
+                  points.push({ x: x, y: y, blueness: blueness });
+               }
+            }
+
+            var centroid1 = points[0];
+            var centroid2 = points[points.length - 1];
+
+            var group1 = [];
+            var group2 = [];
+
+            for (var i = 1; i <= 10; i++) {
+               group1 = [];
+               group2 = [];
+               for (var j = 0; j < points.length; j++) {
+                  var p = points[j];
+                  if (distance(p, centroid1) < distance(p, centroid2)) {
+                     group1.push(p);
+                  } else {
+                     group2.push(p);
+                  }
+               }
+
+               centroid1 = this.averagePoints(group1);
+               centroid2 = this.averagePoints(group2);
+            }
+
+            var size1 = Math.sqrt(group1.length);
+            var radius1 = size1 / 2;
+            var size2 = Math.sqrt(group2.length);
+            var radius2 = size2 / 2;
+
+            var marker1 = {
+               centroid: centroid1,
+               points: group1,
+               radius: radius1
+            };
+            var marker2 = {
+               centroid: centroid2,
+               points: group2,
+               radius: radius2
+            };
+            return {
+               leftMarker: centroid1.x < centroid2.x ? marker1 : marker2,
+               rightMarker: centroid1.x < centroid2.x ? marker2 : marker1
+            };
+         };
 
          function distance(p1, p2) {
             return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
          }
+
+         var myVideo = document.createElement("video");
+         var myCanvas = document.getElementById("myCanvas");
+         var ctx = myCanvas.getContext("2d");
+         var markerDetector = new MarkerDetector();
 
          function loop() {
             ctx.drawImage(myVideo, 0, 0, myCanvas.width, myCanvas.height);
@@ -40,11 +125,15 @@
                   ctx.fillRect(point.x, point.y, 1, 1);
                }
             }
-            setTimeout(loop, 16);  // Using setTimeout instead of requestAnimationFrame for better compatibility
+            requestAnimationFrame(loop);
          }
 
          function onSuccess(rawData) {
-            myVideo.src = URL.createObjectURL(rawData);
+            if ("srcObject" in myVideo) {
+               myVideo.srcObject = rawData;
+            } else {
+               myVideo.src = window.URL.createObjectURL(rawData);
+            }
             myVideo.play();
             myVideo.addEventListener('loadeddata', function() {
                myCanvas.width = myVideo.videoWidth;
@@ -56,9 +145,6 @@
          function onError(err) {
             alert(err);
          }
-
-         // Fallback for getUserMedia
-         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
          if (navigator.getUserMedia) {
             navigator.getUserMedia({ video: true }, onSuccess, onError);
