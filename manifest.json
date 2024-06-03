@@ -1,6 +1,6 @@
 {
-  "name": "Codacom",
-  "short_name": "Codacom",
+  "name": "Farouk Touil",
+  "short_name": "Farouk Touil",
   "description": "Mon profil digital",
   "icons": [
     {
@@ -37,19 +37,8 @@
     }
   ],
   "orientation": "portrait-primary",
-  "theme_color": "rgba(198, 72, 23, 0.5)",
-  "background_color": "rgba(198, 72, 23, 0.5)",
+  "theme_color": "#c64817",
+  "background_color": "#c64817",
   "display": "standalone",
-  "start_url": "/",
-  "scope": "/",
-  "lang": "en",
-  "dir": "ltr",
-  "prefer_related_applications": false,
-  "related_applications": [],
-  "crossorigin": "use-credentials",
-  "serviceworker": {
-    "src": "/sw.js",
-    "scope": "/",
-    "type": "classic"
-  }
+  "start_url": "/"
 }
