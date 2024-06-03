@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Recorder with Church Hall Reverb</title>
+  <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+  <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+  <div data-role="page">
+    <div data-role="header">
+      <h1>Voice Recorder with Church Hall Reverb</h1>
+    </div>
+    <div role="main" class="ui-content">
+      <button id="record-button">Record</button>
+      <button id="play-button">Play</button>
+      <button id="stop-button">Stop</button>
+    </div>
+  </div>
+
+  <script src="https://reverbjs.org/reverb.js"></script>
+  <script>
+    var audioContext;
+    var sourceNode;
+    var reverbNode;
+    var recordedChunks = [];
+    var mediaRecorder;
+
+    $(document).on("pagecreate", function() {
+      function initializeAudio() {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        reverbjs.extend(audioContext);
+
+        var reverbUrl = "https://reverbjs.org/Library/MaesHowe.m4a";
+        reverbNode = audioContext.createReverbFromUrl(reverbUrl, function() {
+          reverbNode.connect(audioContext.destination);
+        });
+      }
+
+      // ...
+
+      $("#record-button").on("click", function() {
+        startRecording();
+      });
+
+      $("#play-button").on("click", function() {
+        stopPlayback();
+        if (sourceNode) {
+          sourceNode.start();
+        }
+      });
+
+      // ...
+
+      // New test link for starting the audio playback
+      $("body").append('<a href="javascript:sourceNode.start()">Test</a>');
+    });
+  </script>
+</body>
+</html>
