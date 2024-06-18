@@ -68,13 +68,13 @@
     if (input.name) {
       // If the file has the mp3, ogg, wav, webm, m4a, aac, or avi extension
       if (
-        input.name.slice(-3) == "wav" ||
-        input.name.slice(-3) == "mp3" ||
+       // input.name.slice(-3) == "wav" ||
+        //input.name.slice(-3) == "mp3" ||
         input.name.slice(-3) == "ogg" ||
-        input.name.slice(-3) == "m4a" ||
-        input.name.slice(-3) == "aac" ||
-        input.name.slice(-3) == "avi" ||
-        input.name.slice(-4) == "webm"
+       // input.name.slice(-3) == "m4a" ||
+        input.name.slice(-3) == "aac" 
+       // input.name.slice(-3) == "avi" ||
+       // input.name.slice(-4) == "webm"
       ) {
         document.getElementById("form-file-label").textContent =
           "You have selected a valid file";
