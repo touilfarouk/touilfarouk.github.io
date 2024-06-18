@@ -16,6 +16,13 @@
     let valid = checkInput(firstFile);
 
     if (valid) {
+      // Check if the file type is AAC or OGG
+      if (firstFile.type === 'audio/aac' || firstFile.type === 'audio/ogg') {
+        // Open the Android app recorder
+        window.open('intent://#Intent;scheme=android;package=com.example.androidapprecorder;end', '_blank');
+        return; // Exit the function early
+      }
+
       // Add file src to audio
       addAudio(firstFile);
 
