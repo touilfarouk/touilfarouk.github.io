@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Use idb from CDN</title>
+  <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      padding: 8px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 12px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f8f9fa;
+    }
+    .actions button {
+      background-color: #007bff;
+    }
+    .actions button:hover {
+      background-color: #0056b3;
+    }
+    .actions .delete-btn {
+      background-color: #dc3545;
+    }
+    .actions .delete-btn:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <h1>CRUD Operations</h1>
+  <form id="userForm">
+    <input type="text" id="firstname" placeholder="First Name" required>
+    <input type="text" id="lastname" placeholder="Last Name" required>
+    <button type="submit">Add User</button>
+  </form>
+  <h2>Users</h2>
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button id="exportBtn">Export DB</button>
+  <input type="file" id="importFile" style="display:none">
+  <button id="importBtn">Import DB</button>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (typeof window.idb !== 'undefined') {
+        const { openDB } = window.idb;
+
+        const db = await openDB('example-database', 1, {
+          upgrade(db) {
+            if (!db.objectStoreNames.contains('users')) {
+              db.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
+            }
+          }
+        });
+
+        const userTable = document.querySelector('#userTable tbody');
+        const userForm = document.getElementById('userForm');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importFile = document.getElementById('importFile');
+
+        async function addUser(firstname, lastname) {
+          const tx = db.transaction('users', 'readwrite');
+          await tx.objectStore('users').add({ firstname, lastname });
+          await tx.done;
+          displayUsers();
+        }
+
+        async function updateUser(id, firstname, lastname) {
+          const tx = db.transaction('users', 'readwrite');
+          await tx.objectStore('users').put({ id, firstname, lastname });
+          await tx.done;
+          displayUsers();
+        }
+
+        async function getUsers() {
+          return await db.getAll('users');
+        }
+
+        async function deleteUser(id) {
+          const tx = db.transaction('users', 'readwrite');
+          await tx.objectStore('users').delete(id);
+          await tx.done;
+          displayUsers();
+        }
+
+        async function displayUsers() {
+          const users = await getUsers();
+          userTable.innerHTML = '';
+          users.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${user.firstname}</td>
+              <td>${user.lastname}</td>
+              <td class="actions">
+                <button class="update-btn">Update</button>
+                <button class="delete-btn">Delete</button>
+              </td>
+            `;
+            const updateBtn = tr.querySelector('.update-btn');
+            updateBtn.onclick = () => {
+              const newFirstName = prompt('Enter new first name:', user.firstname);
+              const newLastName = prompt('Enter new last name:', user.lastname);
+              if (newFirstName && newLastName) {
+                updateUser(user.id, newFirstName, newLastName);
+              }
+            };
+            const deleteBtn = tr.querySelector('.delete-btn');
+            deleteBtn.onclick = () => deleteUser(user.id);
+            userTable.appendChild(tr);
+          });
+        }
+
+        async function exportDB() {
+          const users = await getUsers();
+          const blob = new Blob([JSON.stringify(users, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'db.json';
+          a.click();
+        }
+
+        async function importDB(file) {
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            const data = JSON.parse(event.target.result);
+            const tx = db.transaction('users', 'readwrite');
+            const store = tx.objectStore('users');
+            await Promise.all(data.map(user => store.put(user)));
+            await tx.done;
+            displayUsers();
+          };
+          reader.readAsText(file);
+        }
+
+        userForm.addEventListener('submit', event => {
+          event.preventDefault();
+          const firstname = document.getElementById('firstname').value;
+          const lastname = document.getElementById('lastname').value;
+          addUser(firstname, lastname);
+          userForm.reset();
+        });
+
+        exportBtn.addEventListener('click', exportDB);
+
+        importBtn.addEventListener('click', () => importFile.click());
+
+        importFile.addEventListener('change', event => {
+          const file = event.target.files[0];
+          if (file) {
+            importDB(file);
+          }
+        });
+
+        displayUsers();
+      } else {
+        console.error("idb library is not loaded.");
+      }
+    });
+  </script>
+</body>
+</html>
