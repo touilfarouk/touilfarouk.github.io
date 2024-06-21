@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dexie.js CRUD Operations</title>
+  <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input[type="text"], input[type="number"] {
+      padding: 8px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 12px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f8f9fa;
+    }
+    .actions button {
+      background-color: #007bff;
+    }
+    .actions button:hover {
+      background-color: #0056b3;
+    }
+    .actions .delete-btn {
+      background-color: #dc3545;
+    }
+    .actions .delete-btn:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <h1>CRUD Operations with Dexie.js</h1>
+  <form id="userForm">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="number" id="age" placeholder="Age" required>
+    <button type="submit">Add User</button>
+  </form>
+  <h2>Users</h2>
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Initialize Dexie database
+      var db = new Dexie("FriendDatabase");
+      db.version(1).stores({
+        friends: `++id, name, age`
+      });
+
+      const userForm = document.getElementById('userForm');
+      const userTable = document.querySelector('#userTable tbody');
+
+      async function addUser(name, age) {
+        await db.friends.add({ name, age });
+        displayUsers();
+      }
+
+      async function updateUser(id, name, age) {
+        await db.friends.update(id, { name, age });
+        displayUsers();
+      }
+
+      async function deleteUser(id) {
+        await db.friends.delete(id);
+        displayUsers();
+      }
+
+      async function getUsers() {
+        return await db.friends.toArray();
+      }
+
+      async function displayUsers() {
+        const users = await getUsers();
+        userTable.innerHTML = '';
+        users.forEach(user => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${user.name}</td>
+            <td>${user.age}</td>
+            <td class="actions">
+              <button class="update-btn">Update</button>
+              <button class="delete-btn">Delete</button>
+            </td>
+          `;
+          const updateBtn = tr.querySelector('.update-btn');
+          updateBtn.onclick = () => {
+            const newName = prompt('Enter new name:', user.name);
+            const newAge = prompt('Enter new age:', user.age);
+            if (newName && newAge) {
+              updateUser(user.id, newName, parseInt(newAge));
+            }
+          };
+          const deleteBtn = tr.querySelector('.delete-btn');
+          deleteBtn.onclick = () => deleteUser(user.id);
+          userTable.appendChild(tr);
+        });
+      }
+
+      userForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const name = document.getElementById('name').value;
+        const age = parseInt(document.getElementById('age').value);
+        addUser(name, age);
+        userForm.reset();
+      });
+
+      displayUsers();
+    });
+  </script>
+</body>
+</html>

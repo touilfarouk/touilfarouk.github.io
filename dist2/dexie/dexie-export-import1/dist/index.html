@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - dexie-export-import1</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="column"><p>
+  <a id="exportLink" href="#">Click here to export the database</a>
+</p>
+<div id="dropzone">
+  Drop dexie export JSON file here
+</div>
+</div><div class="column">
+  <h3>Database Info</h3>
+  <table border="1">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+</div>
+<!-- partial -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/dexie/2.0.4/dexie.min.js'></script>
+<script src='https://unpkg.com/dexie-export-import/dist/dexie-export-import.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js'></script><script type="module" src="./script.js"></script>
+
+</body>
+</html>
