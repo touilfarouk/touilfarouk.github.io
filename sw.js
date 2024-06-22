@@ -3,25 +3,24 @@ let isOnline = true; //will get updated via messaging
 const staticCache = `pwaEx3StaticCache${version}`;
 const dynamicCache = `pwaEx3DynamicCache${version}`;
 const cacheList = [
-  "/",
-  "/index.html",
-  "/css/style.css",
-  "/css/color.css",
-  "/js/app.js",
-  "/js/jquery.min.js", // Add the jquery.min.js file to be cached
-  "/js/plugins.js",
-  "/img/android-chrome-192x192.png",
-
-  "/images/logo.png",
-  "/images/logo.png",
-  "/images/bg/10.jpg",
-  "/images/bg/7.jpg",
-  "/images/bg/8.jpg",
-  "/images/bg/13.jpg",
-  "https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.js",
-   "https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap",
-  "https://fonts.googleapis.com/css2?family=Mukta+Vaani:wght@200;300;400;500;600;700;800&amp;family=Oswald:wght@500;700&amp;family=Roboto:wght@500&amp;display=swap"
-  // Add other files to cache as needed
+  '/',
+  '/index.html',
+  '/other.html',
+  '/404.html',
+  '/css/main.css',
+  '/js/app.js',
+  '/manifest.json',
+  '/img/offline-1.png',
+  '/favicon.ico',
+  '/img/android-chrome-192x192.png',
+  '/img/android-chrome-512x512.png',
+  '/img/apple-touch-icon.png',
+  '/img/favicon-16x16.png',
+  '/img/favicon-32x32.png',
+  '/img/mstile-150x150.png',
+  // Add a google font in your css and here
+  'https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.js',
+  // Add other JS files to cache as needed
 ];
 
 self.addEventListener('install', (ev) => {
@@ -81,13 +80,11 @@ self.addEventListener('message', (ev) => {
   }
 });
 
-function sendMessage(msg) {
-  self.clients.matchAll().then(function (clients) {
-    if (clients && clients.length) {
-      clients[0].postMessage(msg);
-    }
-  });
-}
+self.addEventListener('sync', (ev) => {
+  if (ev.tag === 'sync-database') {
+    ev.waitUntil(resetAndImportDB());
+  }
+});
 
 async function resetAndImportDB() {
   try {
@@ -110,4 +107,12 @@ async function resetAndImportDB() {
   } catch (error) {
     console.error('Failed to reset and import DB:', error);
   }
+}
+
+function sendMessage(msg) {
+  self.clients.matchAll().then(function (clients) {
+    if (clients && clients.length) {
+      clients[0].postMessage(msg);
+    }
+  });
 }

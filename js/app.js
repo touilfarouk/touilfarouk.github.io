@@ -15,6 +15,13 @@ const APP = {
       });
       navigator.serviceWorker.ready.then((registration) => {
         APP.sw = registration.active;
+        if ('periodicSync' in registration) {
+          registration.periodicSync.register('sync-database', {
+            minInterval: 24 * 60 * 60 * 1000 // 24 hours
+          });
+        } else if ('sync' in registration) {
+          registration.sync.register('sync-database');
+        }
       });
     }
   },
