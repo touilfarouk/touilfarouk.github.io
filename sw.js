@@ -1,6 +1,6 @@
-const version = 25;
+const version = 27;
 let isOnline = true; //will get updated via messaging
-const staticCache = "pwaEx3StaticCache" + version;
+const staticCache = `pwaEx3StaticCache${version}`;
 const dynamicCache = `pwaEx3DynamicCache${version}`;
 const cacheList = [
   "/",
@@ -21,19 +21,18 @@ const cacheList = [
   // Add other files to cache as needed
 ];
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches
-      .open(staticCache)
-      .then((cache) => cache.addAll(cacheList))
-      .catch((error) => {
-        console.error("Failed to cache one or more resources:", error);
-      })
+
+//TODO: complete the functions for these events
+self.addEventListener('install', (ev) => {
+  ev.waitUntil(
+    caches.open(staticCache).then((cache) => {
+      //save the whole cacheList
+      cache.addAll(cacheList);
+    })
   );
-  self.skipWaiting(); // Activate the service worker immediately
 });
 
-self.addEventListener("activate", (ev) => {
+self.addEventListener('activate', (ev) => {
   ev.waitUntil(
     caches
       .keys()
@@ -52,41 +51,48 @@ self.addEventListener("activate", (ev) => {
       })
       .catch(console.warn)
   );
-  if (self.clients && self.clients.claim) {
-    self.clients.claim(); // Take control of all existing clients immediately
-  }
 });
 
-// Listen for the 'install' event to cache the assets
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(staticCache).then((cache) => {
-      return cache.addAll(cacheList);
-    })
-  );
-});
-
-// Intercept network requests and serve from cache if available
-self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        return response; // Serve from cache
+self.addEventListener('fetch', (ev) => {
+  ev.respondWith(
+    caches.match(ev.request).then((cacheRes) => {
+      return cacheRes || fetchAndUpdate(ev.request);
+    }).catch(() => {
+      if (ev.request.mode === 'navigate') {
+        return caches.match('/404.html');
       }
-      return fetch(event.request); // Fall back to network fetch
     })
   );
 });
 
-self.addEventListener("message", (ev) => {
+async function fetchAndUpdate(request) {
+  const fetchRes = await fetch(request);
+  if (!fetchRes.ok) throw new Error('Fetch failed');
+  const cache = await caches.open(dynamicCache);
+  cache.put(request, fetchRes.clone());
+  return fetchRes;
+}
+
+
+self.addEventListener('message', (ev) => {
   console.log(ev.data);
   //message received from script
   if (ev.data.ONLINE) {
     isOnline = ev.data.ONLINE;
+    //we could confirm if actually online and send a message to the browser if not
+    // use a fetch with method: HEAD to do this
+    // in the webpage-side code set a timer to resend the online message
+    // which will trigger this code again
   }
+  //handle other messages from the browser...
+  //EG: CLEARDYNAMICCACHE, CLEARSTATICCACHE, LOADFILE, CONFIRMONLINE,
+  //    GETFROMDB, etc
 });
 
 function sendMessage(msg) {
+  //send a message to the browser
+  //from the service Worker
+  //code from messaging.js Client API send message code
   self.clients.matchAll().then(function (clients) {
     if (clients && clients.length) {
       //Respond to last focused tab
