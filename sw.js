@@ -18,38 +18,28 @@ const cacheList = [
   "/images/bg/7.jpg",
   "/images/bg/8.jpg",
   "/images/bg/13.jpg",
+  "https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.js",
+   "https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap",
+  "https://fonts.googleapis.com/css2?family=Mukta+Vaani:wght@200;300;400;500;600;700;800&amp;family=Oswald:wght@500;700&amp;family=Roboto:wght@500&amp;display=swap"
   // Add other files to cache as needed
 ];
 
-
-//TODO: complete the functions for these events
 self.addEventListener('install', (ev) => {
   ev.waitUntil(
     caches.open(staticCache).then((cache) => {
-      //save the whole cacheList
-      cache.addAll(cacheList);
+      return cache.addAll(cacheList);
     })
   );
 });
 
 self.addEventListener('activate', (ev) => {
   ev.waitUntil(
-    caches
-      .keys()
-      .then((keys) => {
-        return Promise.all(
-          keys
-            .filter((key) => {
-              if (key === staticCache || key === dynamicCache) {
-                return false;
-              } else {
-                return true;
-              }
-            })
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== staticCache && key !== dynamicCache)
             .map((key) => caches.delete(key))
-        ); //keys.filter().map() returns an array of Promises
-      })
-      .catch(console.warn)
+      );
+    }).catch(console.warn)
   );
 });
 
@@ -66,38 +56,58 @@ self.addEventListener('fetch', (ev) => {
 });
 
 async function fetchAndUpdate(request) {
-  const fetchRes = await fetch(request);
-  if (!fetchRes.ok) throw new Error('Fetch failed');
-  const cache = await caches.open(dynamicCache);
-  cache.put(request, fetchRes.clone());
-  return fetchRes;
-}
+  try {
+    const fetchRes = await fetch(request);
+    if (!fetchRes || fetchRes.status !== 200 || fetchRes.type !== 'basic') {
+      return fetchRes;
+    }
 
+    const cache = await caches.open(dynamicCache);
+    cache.put(request, fetchRes.clone());
+    return fetchRes;
+  } catch (error) {
+    console.error('Fetch failed:', error);
+    throw error;
+  }
+}
 
 self.addEventListener('message', (ev) => {
   console.log(ev.data);
-  //message received from script
   if (ev.data.ONLINE) {
     isOnline = ev.data.ONLINE;
-    //we could confirm if actually online and send a message to the browser if not
-    // use a fetch with method: HEAD to do this
-    // in the webpage-side code set a timer to resend the online message
-    // which will trigger this code again
   }
-  //handle other messages from the browser...
-  //EG: CLEARDYNAMICCACHE, CLEARSTATICCACHE, LOADFILE, CONFIRMONLINE,
-  //    GETFROMDB, etc
+  if (ev.data.action === 'RESET_AND_IMPORT_DB') {
+    resetAndImportDB();
+  }
 });
 
 function sendMessage(msg) {
-  //send a message to the browser
-  //from the service Worker
-  //code from messaging.js Client API send message code
   self.clients.matchAll().then(function (clients) {
     if (clients && clients.length) {
-      //Respond to last focused tab
       clients[0].postMessage(msg);
     }
   });
-  //See the code from the online video for the version that messages ALL Clients
+}
+
+async function resetAndImportDB() {
+  try {
+    const response = await fetch('/db.json');
+    const data = await response.json();
+
+    importScripts('https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.min.js');
+
+    const db = new Dexie("FriendDatabase");
+    db.version(1).stores({
+      friends: `++id, name, age`
+    });
+
+    await db.transaction('rw', db.friends, async () => {
+      await db.friends.clear();
+      await db.friends.bulkAdd(data);
+    });
+
+    sendMessage({ action: 'DB_UPDATED' });
+  } catch (error) {
+    console.error('Failed to reset and import DB:', error);
+  }
 }

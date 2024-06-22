@@ -1,0 +1,53 @@
+<script src="https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.js"></script>
+<table id="userTable">
+                            <tbody></tbody>
+                           </table>
+<script>
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const userTable = document.querySelector('#userTable tbody');
+    // Initialize Dexie database
+    var db = new Dexie("FriendDatabase");
+    db.version(1).stores({
+      friends: `++id, name, age`
+    });
+  async function getUsers() {
+    return await db.friends.toArray();
+  }
+
+  async function displayUsers() {
+    const users = await getUsers();
+    userTable.innerHTML = '';
+    users.forEach(user => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${user.name}</td>
+        <td>${user.age}</td>
+       
+      `;
+      
+    
+      userTable.appendChild(tr);
+    });
+  }
+
+
+
+
+  async function resetAndImportDB() {
+    const response = await fetch('db.json');
+    const data = await response.json();
+    await db.transaction('rw', db.friends, async () => {
+      await db.friends.clear(); // Clear existing data
+      await db.friends.bulkAdd(data); // Import new data
+    });
+    displayUsers();
+  }
+
+  // Reset and import db.json on every load
+  resetAndImportDB();
+
+
+  });
+
+</script>
