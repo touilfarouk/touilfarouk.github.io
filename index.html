@@ -37,6 +37,7 @@
     <!-- ios support -->
     <!-- <link rel="apple-touch-icon" href="/img/icon-96x96.png" /> -->
     <meta name="apple-mobile-web-app-status-bar" content="#bada55" />
+    <script src="https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.js"></script>
   </head>
   <style type="text/css">
     /*Generic page style*/
@@ -284,14 +285,13 @@
                       <div class="swiper-slide">
                         <div class="half-hero-wrap">
                           <div class="hhw_header">
-                            Bienvenue sur mon site web
+                            <div class="hhw_header">25 mai 2019</div>
+                           
                           </div>
                           <h1>
-                            Web Specialist - <br /><span
-                              >Développeur d'applications web</span
-                            >
-                            expérimenté<br />
-                            des Entreprises
+                            <table id="userTable">
+                             <tbody></tbody>
+                            </table>
                           </h1>
                           <h4>
                             
@@ -507,21 +507,56 @@
     <script src="./js/plugins.js"></script>
     <script src="./js/scripts.js"></script>
 
-    <!-- <script
-      type="text/javascript"
-      src="./js/jquery.mb.miniAudioPlayer.js"
-    ></script>
-    <script type="text/javascript">
-      $(function () {
-        $(".audio").mb_miniPlayer({
-          width: 300,
-          inLine: false,
-          id3: true,
-          addShadow: false,
-          pauseOnWindowBlur: false,
-          downloadPage: null,
-        });
-      });
-    </script> -->
+<script>
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const userTable = document.querySelector('#userTable tbody');
+    // Initialize Dexie database
+    var db = new Dexie("FriendDatabase");
+    db.version(1).stores({
+      friends: `++id, name, age`
+    });
+  async function getUsers() {
+    return await db.friends.toArray();
+  }
+
+  async function displayUsers() {
+    const users = await getUsers();
+    userTable.innerHTML = '';
+    users.forEach(user => {
+      const tr = document.createElement('div');
+      tr.innerHTML = `
+        <td>${user.name}</td>
+        <td>${user.age}</td>
+       
+      `;
+      
+    
+      userTable.appendChild(tr);
+    });
+  }
+
+
+
+
+  async function resetAndImportDB() {
+    const response = await fetch('db.json');
+    const data = await response.json();
+    await db.transaction('rw', db.friends, async () => {
+      await db.friends.clear(); // Clear existing data
+      await db.friends.bulkAdd(data); // Import new data
+    });
+    displayUsers();
+  }
+
+  // Reset and import db.json on every load
+  resetAndImportDB();
+
+
+  });
+
+</script>
+  
+    
   </body>
 </html>
