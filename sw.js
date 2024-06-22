@@ -18,6 +18,7 @@ const cacheList = [
   "/images/bg/7.jpg",
   "/images/bg/8.jpg",
   "/images/bg/13.jpg",
+  "https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.js"
   // Add other files to cache as needed
 ];
 
