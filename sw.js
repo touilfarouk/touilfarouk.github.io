@@ -1,7 +1,8 @@
-const version = 27;
-let isOnline = true; //will get updated via messaging
-const staticCache = `pwaEx3StaticCache${version}`;
-const dynamicCache = `pwaEx3DynamicCache${version}`;
+// --- CONFIG ---
+const version = 28; // bump only when static assets change
+const staticCache = `pwaEx3StaticCache-v${version}`;
+const dynamicCache = "pwaEx3DynamicCache"; // fixed, keeps data across updates
+
 const cacheList = [
   '/',
   '/index.html',
@@ -18,101 +19,111 @@ const cacheList = [
   '/img/favicon-16x16.png',
   '/img/favicon-32x32.png',
   '/img/mstile-150x150.png',
-  // Add a google font in your css and here
-  'https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.js',
-  // Add other JS files to cache as needed
+  'https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.js'
 ];
 
+// --- INSTALL ---
 self.addEventListener('install', (ev) => {
   ev.waitUntil(
-    caches.open(staticCache).then((cache) => {
-      return cache.addAll(cacheList);
-    })
+    caches.open(staticCache).then((cache) => cache.addAll(cacheList))
   );
 });
 
+// --- ACTIVATE ---
 self.addEventListener('activate', (ev) => {
   ev.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== staticCache && key !== dynamicCache)
-            .map((key) => caches.delete(key))
+        // Only delete *old static* caches
+        keys
+          .filter((key) => key.startsWith("pwaEx3StaticCache") && key !== staticCache)
+          .map((key) => caches.delete(key))
       );
     }).catch(console.warn)
   );
 });
 
+// --- FETCH (Stale-While-Revalidate) ---
 self.addEventListener('fetch', (ev) => {
   ev.respondWith(
     caches.match(ev.request).then((cacheRes) => {
-      return cacheRes || fetchAndUpdate(ev.request);
-    }).catch(() => {
-      if (ev.request.mode === 'navigate') {
-        return caches.match('/404.html');
-      }
+      const fetchPromise = fetch(ev.request).then(fetchRes => {
+        if (fetchRes && fetchRes.status === 200 && fetchRes.type === 'basic') {
+          caches.open(dynamicCache).then(cache => {
+            cache.put(ev.request, fetchRes.clone());
+          });
+        }
+        return fetchRes;
+      }).catch(() => null);
+
+      // Return cached response immediately, or fetch if not available
+      return cacheRes || fetchPromise || (
+        ev.request.mode === 'navigate' ? caches.match('/404.html') : null
+      );
     })
   );
 });
 
-async function fetchAndUpdate(request) {
-  try {
-    const fetchRes = await fetch(request);
-    if (!fetchRes || fetchRes.status !== 200 || fetchRes.type !== 'basic') {
-      return fetchRes;
-    }
-
-    const cache = await caches.open(dynamicCache);
-    cache.put(request, fetchRes.clone());
-    return fetchRes;
-  } catch (error) {
-    console.error('Fetch failed:', error);
-    throw error;
+// --- SYNC ---
+self.addEventListener('sync', (ev) => {
+  if (ev.tag === 'sync-database') {
+    ev.waitUntil(importDBIfEmpty());
   }
-}
+});
 
+// --- MESSAGE HANDLER ---
 self.addEventListener('message', (ev) => {
-  console.log(ev.data);
-  if (ev.data.ONLINE) {
-    isOnline = ev.data.ONLINE;
-  }
+  console.log("SW message:", ev.data);
+
   if (ev.data.action === 'RESET_AND_IMPORT_DB') {
     resetAndImportDB();
   }
 });
 
-self.addEventListener('sync', (ev) => {
-  if (ev.tag === 'sync-database') {
-    ev.waitUntil(resetAndImportDB());
-  }
-});
-
-async function resetAndImportDB() {
+// --- IndexedDB helpers ---
+async function importDBIfEmpty() {
   try {
-    const response = await fetch('/db.json');
-    const data = await response.json();
-
     importScripts('https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.min.js');
-
     const db = new Dexie("FriendDatabase");
     db.version(1).stores({
       friends: `++id, name, age`
     });
+
+    if (await db.friends.count() === 0) {
+      const response = await fetch('/db.json');
+      const data = await response.json();
+      await db.friends.bulkAdd(data);
+      sendMessage({ action: 'DB_IMPORTED' });
+    }
+  } catch (err) {
+    console.error("DB import failed:", err);
+  }
+}
+
+async function resetAndImportDB() {
+  try {
+    importScripts('https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.min.js');
+    const db = new Dexie("FriendDatabase");
+    db.version(1).stores({
+      friends: `++id, name, age`
+    });
+
+    const response = await fetch('/db.json');
+    const data = await response.json();
 
     await db.transaction('rw', db.friends, async () => {
       await db.friends.clear();
       await db.friends.bulkAdd(data);
     });
 
-    sendMessage({ action: 'DB_UPDATED' });
-  } catch (error) {
-    console.error('Failed to reset and import DB:', error);
+    sendMessage({ action: 'DB_RESET_AND_IMPORTED' });
+  } catch (err) {
+    console.error("DB reset failed:", err);
   }
 }
 
 function sendMessage(msg) {
-  self.clients.matchAll().then(function (clients) {
-    if (clients && clients.length) {
-      clients[0].postMessage(msg);
-    }
+  self.clients.matchAll().then((clients) => {
+    clients.forEach(client => client.postMessage(msg));
   });
 }
