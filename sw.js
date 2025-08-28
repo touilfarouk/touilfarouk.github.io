@@ -1,5 +1,5 @@
 // --- CONFIG ---
-const version = 28; // bump only when static assets change
+const version = 1; // bump only when static assets change
 const staticCache = `pwaEx3StaticCache-v${version}`;
 const dynamicCache = "pwaEx3DynamicCache"; // fixed, keeps data across updates
 
