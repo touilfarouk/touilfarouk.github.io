@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 | Touil Farouk</title>
+  <meta name="description" content="Page non trouvée - Portfolio de Touil Farouk">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #0f172a;
+      --bg-2: #1e293b;
+      --ink: #f8fafc;
+      --muted: #cbd5e1;
+      --accent: #f97316;
+      --accent-2: #fb7185;
+      --card: rgba(15, 23, 42, 0.64);
+      --stroke: rgba(248, 250, 252, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Sora", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(40rem 40rem at 15% 18%, rgba(249, 115, 22, 0.28), transparent 60%),
+        radial-gradient(32rem 32rem at 85% 80%, rgba(251, 113, 133, 0.20), transparent 60%),
+        linear-gradient(130deg, var(--bg-1), var(--bg-2));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: fixed;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      pointer-events: none;
+      animation: drift 16s linear infinite;
+    }
+
+    .shape.one {
+      width: 190px;
+      height: 190px;
+      top: 10%;
+      right: 7%;
+      border-radius: 44% 56% 61% 39% / 34% 38% 62% 66%;
+    }
+
+    .shape.two {
+      width: 230px;
+      height: 230px;
+      bottom: -20px;
+      left: -35px;
+      border-radius: 51% 49% 39% 61% / 38% 62% 38% 62%;
+      animation-duration: 20s;
+    }
+
+    .wrap {
+      width: min(920px, calc(100% - 2rem));
+      border: 1px solid var(--stroke);
+      border-radius: 24px;
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.35);
+      padding: 2.2rem;
+      position: relative;
+      animation: reveal 650ms ease-out both;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      border: 1px solid rgba(249, 115, 22, 0.55);
+      color: #fed7aa;
+      background: rgba(249, 115, 22, 0.14);
+    }
+
+    .code {
+      margin: 0.8rem 0 0;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(4.6rem, 16vw, 10rem);
+      line-height: 0.9;
+      letter-spacing: 0.07em;
+      color: transparent;
+      background: linear-gradient(100deg, #fff, #fdba74 45%, #fb7185 85%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    h1 {
+      margin: 0.8rem 0 0.65rem;
+      font-size: clamp(1.2rem, 3.5vw, 2rem);
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 62ch;
+      line-height: 1.65;
+      font-size: 0.98rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 1.4rem;
+    }
+
+    .btn {
+      text-decoration: none;
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      font-weight: 600;
+      transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+    }
+
+    .btn-primary {
+      color: #111827;
+      background: linear-gradient(100deg, #fdba74, #fb7185);
+      box-shadow: 0 12px 25px rgba(251, 113, 133, 0.27);
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      border: 1px solid var(--stroke);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .meta {
+      margin-top: 1.25rem;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+    }
+
+    .meta a {
+      color: #fdba74;
+      text-decoration: none;
+    }
+
+    .meta a:hover { text-decoration: underline; }
+
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(12px) scale(0.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(7deg); }
+      to { transform: translateY(0) rotate(0deg); }
+    }
+
+    @media (max-width: 600px) {
+      .wrap { padding: 1.2rem; border-radius: 18px; }
+      p { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shape one"></div>
+  <div class="shape two"></div>
+
+  <main class="wrap">
+    <span class="tag">Erreur de navigation</span>
+    <div class="code">404</div>
+    <h1>Cette page n'existe pas ou a été déplacée.</h1>
+    <p>
+      Vous pouvez revenir à l'accueil, consulter mes projets, ou me contacter directement.
+    </p>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="/index.html">Retour à l'accueil</a>
+      <a class="btn btn-secondary" href="/portfolio.html">Voir le portfolio</a>
+      <a class="btn btn-secondary" href="/contacts.html">Me contacter</a>
+    </div>
+
+    <div class="meta">
+      Touil Farouk • Graphiste • Alger •
+      <a href="mailto:farouktouil@gmail.com">farouktouil@gmail.com</a>
+    </div>
+  </main>
+</body>
+</html>
